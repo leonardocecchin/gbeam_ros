@@ -1,0 +1,8 @@
+<launch>
+
+  <node name="graph_drawer" pkg="gbeam_ground" type="graph_drawer"/>
+  <node name="polytope_drawer" pkg="gbeam_ground" type="polytope_drawer"/>
+
+  <param name="/gbeam_ground/graphics_scaling" value="1" type="double" />
+
+</launch>

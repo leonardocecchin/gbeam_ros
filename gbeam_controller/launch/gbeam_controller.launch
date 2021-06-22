@@ -1,0 +1,10 @@
+<launch>
+
+<!-- GBEAM POLYTOPE GENERATION -->
+  <node name="polytope_gen" pkg="gbeam_controller" type="polytope_generation_node" />
+<!-- GBEAM GRAPH UPDATE -->
+  <node name="graph_update" pkg="gbeam_controller" type="graph_update_node" />
+
+  <node name="exploration" pkg="gbeam_controller" type="exploration_node" />
+
+</launch>

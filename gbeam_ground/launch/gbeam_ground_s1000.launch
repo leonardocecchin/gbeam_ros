@@ -1,0 +1,8 @@
+<launch>
+	<include file="$(find gbeam_ground)/launch/gbeam_ground.launch"/>
+
+	<node name="rviz_s1000" pkg="rviz" type="rviz" args="-d $(find gbeam_ground)/rviz/gbeam_s1000.rviz"/>
+
+	<param name="/gbeam_ground/graphics_scaling" value="5" type="double" />
+
+</launch>
