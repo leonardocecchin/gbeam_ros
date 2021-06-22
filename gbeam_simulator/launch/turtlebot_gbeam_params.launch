@@ -1,0 +1,39 @@
+<launch>
+
+<!-- DDRIVE CONTROLLER PARAMETERS -->
+  <param name="/gbeam_controller/ddrive_position_param/k_rho" value="1" type="double" />
+  <param name="/gbeam_controller/ddrive_position_param/k_alpha" value="1.2" type="double" />
+  <param name="/gbeam_controller/ddrive_position_param/yaw_max" value="1" type="double" />
+  <param name="/gbeam_controller/ddrive_position_param/vel_max" value="0.4" type="double" />
+  <param name="/gbeam_controller/ddrive_position_param/alpha_thr" value="0.2" type="double" />
+  <param name="/gbeam_controller/ddrive_position_param/rho_thr" value="0.02" type="double" />
+
+<!-- GBEAM ROBOT PARAMETERS -->
+  <param name="/gbeam_controller/robot_param/safe_dist" value="0.2" type="double" />
+
+<!-- GBEAM POLYTOPE GENERATION -->
+  <param name="/gbeam_controller/polytope_generation_param/rate" value="2" type="double" />
+  <param name="/gbeam_controller/polytope_generation_param/num_vertices" value="8" type="int" />
+  <param name="/gbeam_controller/polytope_generation_param/distance_step" value="0.005" type="double" />
+  <param name="/gbeam_controller/polytope_generation_param/start_dist" value="0.15" type="double" />
+  <param name="/gbeam_controller/polytope_generation_param/vertex_obstacle_dist" value="0.05" type="double" />
+
+
+<!-- GBEAM GRAPH UPDATE -->
+  <param name="/gbeam_controller/graph_update_param/node_dist_min" value="0.1" type="double" />
+  <param name="/gbeam_controller/graph_update_param/node_dist_open" value="0.3" type="double" />
+  <param name="/gbeam_controller/graph_update_param/node_bound_dist" value="0.2" type="double" />
+  <param name="/gbeam_controller/graph_update_param/node_obstacle_margin" value="0.05" type="double" />
+  <!-- note: bound_dist < 2*(safe_dist - vertex_obstacle_dist) -->
+
+<!-- GBEAM EXPLORATION -->
+  <param name="/gbeam_controller/exploration_param/reached_tol" value="0.05" type="double" />
+  <param name="/gbeam_controller/exploration_param/limit_xi" value="-1" type="double" />
+  <param name="/gbeam_controller/exploration_param/limit_xs" value="1" type="double" />
+  <param name="/gbeam_controller/exploration_param/limit_yi" value="-1" type="double" />
+  <param name="/gbeam_controller/exploration_param/limit_ys" value="1" type="double" />
+
+  <param name="/gbeam_controller/exploration_param/distance_exp" value="4" type="double" />
+
+
+</launch>

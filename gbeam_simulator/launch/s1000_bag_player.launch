@@ -1,0 +1,21 @@
+<launch>
+	<include file="$(find gbeam_ground)/launch/gbeam_ground.launch"/>
+
+<node pkg="rosbag" type="play" name="player" args="--clock /home/leo/Documents/dji_s1000_rosbags/rosbags_2021-04-02/tower_cut.bag">
+	<remap from="tf" to="tf_old" />
+</node>
+
+	<node pkg="tf" type="tf_remap" name="tf_remapper" output="screen">
+<rosparam param="mappings">
+ [{old: "global_ENU", new: odom},{old: lidar, new: base_scan},{old: lidar, new: lidar}]
+</rosparam>
+	</node>
+
+	<node name="rviz_s1000" pkg="rviz" type="rviz" args="-d $(find gbeam_ground)/rviz/gbeam_s1000.rviz"/>
+
+	<node name="console" pkg="rqt_console" type="rqt_console"/>
+
+	<include file="$(find gbeam_controller)/launch/gbeam_s1000_parameters.launch"/>
+	<include file="$(find gbeam_controller)/launch/gbeam_controller.launch"/>
+
+</launch>
