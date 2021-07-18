@@ -5,6 +5,7 @@ The control algorithm is described in the article **insert article here**.
 
 ## Test videos
 
+[![gbeam matlab simulation] (img/9D0L84BI0Cg.png)] (https://www.youtube.com/watch?v=9D0L84BI0Cg)
 
 ## Scheme of the packages
 ![scheme of gbeam package](img/11_gbeam_scheme.png?raw=true "packages scheme")
