@@ -5,10 +5,11 @@ The control algorithm is described in the article **insert article here**.
 
 ## Test videos
 
+### G-BEAM simulation on MatLab/Simulink
 [![gbeam matlab simulation](img/9D0L84BI0Cg.png)](https://www.youtube.com/watch?v=9D0L84BI0Cg)
 
 ## Scheme of the packages
-![scheme of gbeam package](img/11_gbeam_scheme.png?raw=true "packages scheme")
+![scheme of gbeam package](img/11_gbeam_scheme.png "packages scheme")
 This scheme represents the interactions between the packages:
 Package `s1000_interface` is used to interact with the lower level controller of the drone (a DJI S1000, controlled with a DJI A3 board) and the LiDAR sensor.
 Package `gbeam_controller` is where the control algorithm is actually implemented.
