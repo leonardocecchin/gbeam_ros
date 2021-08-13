@@ -5,6 +5,9 @@ The control algorithm is described in the article **insert article here**.
 
 ## Test videos
 
+### G-BEAM experimental Tests, ROS + Quadcopter Drone
+[![gbeam experimental test](img/0suE8IxzbC0.png)](https://www.youtube.com/watch?v=0suE8IxzbC0)
+
 ### G-BEAM simulation on MatLab/Simulink
 [![gbeam matlab simulation](img/9D0L84BI0Cg.png)](https://www.youtube.com/watch?v=9D0L84BI0Cg)
 
