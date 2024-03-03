@@ -21,6 +21,8 @@ devel_isolated/
 .project
 .cproject
 
+# vscode stuff
+.vscode/
 
 # Emacs
 .#*
