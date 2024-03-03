@@ -44,7 +44,7 @@ float node_bound_dist = 0.5;
 float safe_dist = 0.2;
 float limit_xi = 0, limit_xs = 0, limit_yi = 0, limit_ys = 0;
 
-float obstacle_margin = 0.05;       // ADD AS A PARAMETER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+float obstacle_margin = 0.05;       // TODO: ADD AS A PARAMETER
 
 bool setStatus(gbeam_library::setMappingStatus::Request &rqt, gbeam_library::setMappingStatus::Response &res)
 {
