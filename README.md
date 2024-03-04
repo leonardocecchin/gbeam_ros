@@ -60,5 +60,6 @@ It is possible to test the controller by executing it in simulation with Turtleb
 3. Enable the mapping. In a new terminal, from the workspace base folder (e.g. `~/gbeam_ros_ws`):
     ```
         source /opt/ros/noetic/setup.bash
-        roslaunch gbeam_simulator gbeam_turtlebot3_gazebo.launch
+        rosservice call /gbeam/set_mapping_status true
     ```
+    This command should return `response: True`, and the mapping should start.
