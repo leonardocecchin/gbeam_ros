@@ -49,17 +49,20 @@ The ROS installation process is described in the [official wiki](http://wiki.ros
 
 ### Testing
 It is possible to test the controller by executing it in simulation with Turtlebot 3:
-1. Select the turtlebot model (`burger`, `waffle` or `waffle_pi`):
+1. Source the environment rom the workspace base folder (e.g. `~/gbeam_ros_ws`):
+    ```
+        source devel/setup.bash
+    ```
+2. Select the turtlebot model (`burger`, `waffle` or `waffle_pi`):
     ```
         export TURTLEBOT3_MODEL=burger
     ```
-2. Run the simulation:
+3. Run the simulation:
     ```
         roslaunch gbeam_simulator gbeam_turtlebot3_gazebo.launch
     ```
-3. Enable the mapping. In a new terminal, from the workspace base folder (e.g. `~/gbeam_ros_ws`):
+4. Enable the mapping. In a new terminal, from the workspace base folder (e.g. `~/gbeam_ros_ws`):
     ```
-        source /opt/ros/noetic/setup.bash
-        rosservice call /gbeam/set_mapping_status true
+        source devel/setup.bash
+        roslaunch gbeam_simulator gbeam_turtlebot3_gazebo.launch
     ```
-    This command should return `response: True`, and the mapping should start.
