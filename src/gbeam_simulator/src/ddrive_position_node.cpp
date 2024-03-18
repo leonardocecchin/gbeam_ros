@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     {
         if (alpha < alpha_thr && alpha > -alpha_thr)
         {
-          cmd_vel.linear.x = limit(k_rho * rho, vel_max, 0);
+          cmd_vel.linear.x = limit(k_rho * rho * cos(alpha), vel_max, 0);
           cmd_vel.angular.z = limit(k_alpha * alpha, yaw_max, -yaw_max);
         }
         else
