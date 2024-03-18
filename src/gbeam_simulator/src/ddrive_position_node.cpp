@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "pos_contr");
   ros::NodeHandle n;
   ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug); //set console to show debug messages by default
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(100);
 
   ros::Subscriber scan_sub = n.subscribe("/scan", 1, scanCallback);
   ros::Subscriber odom_sub = n.subscribe("/odom", 1, odomCallback);
@@ -59,34 +59,34 @@ int main(int argc, char **argv)
     n.getParam("/gbeam_controller/ddrive_position_param/yaw_max", yaw_max);
     n.getParam("/gbeam_controller/ddrive_position_param/vel_max", vel_max);
 
-      float delta_x = target_pos.pose.position.x - robot_odom.pose.pose.position.x;
-      float delta_y = target_pos.pose.position.y - robot_odom.pose.pose.position.y;
-      float yaw_part_y = 2 * (robot_odom.pose.pose.orientation.w * robot_odom.pose.pose.orientation.z + robot_odom.pose.pose.orientation.x * robot_odom.pose.pose.orientation.y);
-      float yaw_part_x = 1 - 2 * (robot_odom.pose.pose.orientation.y * robot_odom.pose.pose.orientation.y + robot_odom.pose.pose.orientation.z * robot_odom.pose.pose.orientation.z);
-      float yaw = atan2(yaw_part_y, yaw_part_x); // yaw of the robot
+    float delta_x = target_pos.pose.position.x - robot_odom.pose.pose.position.x;
+    float delta_y = target_pos.pose.position.y - robot_odom.pose.pose.position.y;
+    float yaw_part_y = 2 * (robot_odom.pose.pose.orientation.w * robot_odom.pose.pose.orientation.z + robot_odom.pose.pose.orientation.x * robot_odom.pose.pose.orientation.y);
+    float yaw_part_x = 1 - 2 * (robot_odom.pose.pose.orientation.y * robot_odom.pose.pose.orientation.y + robot_odom.pose.pose.orientation.z * robot_odom.pose.pose.orientation.z);
+    float yaw = atan2(yaw_part_y, yaw_part_x); // yaw of the robot
 
-      float rho = sqrt(pow(delta_x, 2) + pow(delta_y, 2)); // distance from the target
-      float dest_ang = atan2(delta_y, delta_x); // direction of target wrt pos
-      float alpha = atan2(sin(dest_ang-yaw), cos(dest_ang-yaw)); // angular difference from yaw to target direction
+    float rho = sqrt(pow(delta_x, 2) + pow(delta_y, 2)); // distance from the target
+    float dest_ang = atan2(delta_y, delta_x); // direction of target wrt pos
+    float alpha = atan2(sin(dest_ang-yaw), cos(dest_ang-yaw)); // angular difference from yaw to target direction
 
-      if (rho < rho_thr)
-      {
-	      cmd_vel.linear.x = 0;
-	      cmd_vel.angular.z = 0;
-      }
-      else
-      {
-      		if (alpha < alpha_thr && alpha > -alpha_thr)
-      		{
-	      		cmd_vel.linear.x = limit(k_rho * rho * cos(alpha), vel_max, 0);
-              		cmd_vel.angular.z = limit(k_alpha * alpha, yaw_max, -yaw_max);
-      		}
-      		else
-      		{
-	      		cmd_vel.linear.x = 0;
-              		cmd_vel.angular.z = limit(k_alpha * alpha, yaw_max, -yaw_max);
-      		}
-      }
+    if (rho < rho_thr)
+    {
+      cmd_vel.linear.x = 0;
+      cmd_vel.angular.z = 0.1;
+    }
+    else
+    {
+        if (alpha < alpha_thr && alpha > -alpha_thr)
+        {
+          cmd_vel.linear.x = limit(k_rho * rho, vel_max, 0);
+          cmd_vel.angular.z = limit(k_alpha * alpha, yaw_max, -yaw_max);
+        }
+        else
+        {
+          cmd_vel.linear.x = 0;
+          cmd_vel.angular.z = limit(k_alpha * alpha, yaw_max, -yaw_max);
+        }
+    }
 
     cmd_vel_pub.publish(cmd_vel);
 
