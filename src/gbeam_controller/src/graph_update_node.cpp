@@ -41,7 +41,7 @@ float adjacency[10000][10000] = {};
 
 float node_dist_min = 0.2, node_dist_open = 1;
 float node_bound_dist = 0.5;
-float safe_dist = 0.2;
+float safe_dist = 0.2, reached_tol = 0.1;
 float limit_xi = 0, limit_xs = 0, limit_yi = 0, limit_ys = 0;
 
 float obstacle_margin = 0.05;       // TODO: ADD AS A PARAMETER
@@ -71,6 +71,8 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
   ros::param::get("/gbeam_controller/exploration_param/limit_xs", limit_xs);
   ros::param::get("/gbeam_controller/exploration_param/limit_yi", limit_yi);
   ros::param::get("/gbeam_controller/exploration_param/limit_ys", limit_ys);
+  ros::param::get("/gbeam_controller/exploration_param/reached_tol", reached_tol);
+  reached_tol *= 1.5;
 
   //get transform
   try
@@ -207,7 +209,11 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
           }
         }
         if (connected_left && connected_right)
+        {
           graph.nodes[n].is_completely_connected = true;
+          is_changed = true;
+          graph.nodes[n].gain = 0;
+        }
       }
     }
   }
@@ -217,7 +223,14 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
   position = vert_transform(position, l2g_tf);  // create temporary vertex at robot position
   for (int i=0; i<graph.nodes.size(); i++)
   {
-    if (dist(position, graph.nodes[i]) < node_dist_open)
+    // if node is inside reachable area, and gain is > 1, decrease gain to 1
+    if (isInsideReachable(polyGlobal, graph.nodes[i]) && graph.nodes[i].gain > 1)
+    {
+      graph.nodes[i].gain = 1;
+      is_changed = true;
+    }
+    // if node has been visited, set gain to 0
+    if (dist(position, graph.nodes[i]) < reached_tol)
     {
       graph.nodes[i].gain = 0;
       graph.nodes[i].is_visited = true;
