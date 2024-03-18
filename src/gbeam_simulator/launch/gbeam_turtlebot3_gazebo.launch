@@ -25,17 +25,23 @@
   <!-- <node name="console" pkg="rqt_console" type="rqt_console"/> -->
 
 
-<!-- Launch GBEAM -->
+  <!-- Launch GBEAM -->
   <include file="$(find gbeam_simulator)/launch/turtlebot_gbeam_params.launch"/>
   <!-- <remap from="/gbeam/gbeam_pos_ref" to="/s1000_interface/pos_ref"/> -->
   <include file="$(find gbeam_controller)/launch/gbeam_controller.launch"/>
   <include file="$(find gbeam_ground)/launch/gbeam_ground.launch"/>
 
-<!-- Launch Interface nodes with Turtlebot -->
-  <!-- uncomment line with /gbeam/gbeam_pos_ref to use in autonomous mode, the other to use with manual control through rviz -->
+  <!-- Launch Interface nodes with Turtlebot -->
+  <!-- choose position reference source -->
   <!-- <remap from="/ddrive_pos_in" to="/move_base_simple/goal"/>   -->
   <remap from="/ddrive_pos_in" to="/gbeam/gbeam_pos_ref"/>
   <node name="ddrive" pkg="gbeam_simulator" type="ddrive_position_node"/>
+
+  <!-- Set GBEAM mapping status to true -->
+  <node pkg="rosservice" type="rosservice" name="enable_mapping" args="call /gbeam/set_mapping_status true" />
+
+
+
 
 
 </launch>
