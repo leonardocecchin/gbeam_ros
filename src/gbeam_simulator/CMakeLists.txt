@@ -86,17 +86,12 @@ include_directories(
 )
 
 add_executable(ddrive_position_node src/ddrive_position_node.cpp)
-add_executable(posestamped_to_pose src/posestamped_to_pose.cpp)
 
 add_dependencies(ddrive_position_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(posestamped_to_pose ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 
 target_link_libraries(ddrive_position_node
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(posestamped_to_pose
   ${catkin_LIBRARIES}
 )
 
