@@ -79,6 +79,16 @@ void computeNewTarget()
 
   pos_ref.pose.position = vertex2point(vert);
   pos_ref.pose.position.z = mapping_z;
+
+  // Fill other properties of pos_ref
+  pos_ref.header.stamp = ros::Time::now();
+  pos_ref.header.frame_id = "odom";
+
+  pos_ref.pose.orientation.x = 0.0;
+  pos_ref.pose.orientation.y = 0.0;
+  pos_ref.pose.orientation.z = 0.0;
+  pos_ref.pose.orientation.w = 1.0;
+
   pos_ref_pub.publish(pos_ref);
 }
 
