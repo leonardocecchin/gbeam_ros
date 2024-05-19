@@ -145,15 +145,18 @@ std::vector<int> dijkstra(gbeam_library::ReachabilityGraph graph, int s, int t)
       // if an edge is connected to u, then check if the node it is connected to
       // belongs to set Q. In that case check if the total distance passing through u
       // is shorter than the current best one, in that case update it.
-      if(graph.edges[e].v1 == u && Q_set[graph.edges[e].v2] && dist[graph.edges[e].v2] > (dist[u]+graph.edges[e].length))
+      if(graph.edges[e].is_walkable)
       {
-        dist[graph.edges[e].v2] = dist[u] + graph.edges[e].length;
-        prev[graph.edges[e].v2] = u;
-      }
-      if(graph.edges[e].v2 == u && Q_set[graph.edges[e].v1] && dist[graph.edges[e].v1] > (dist[u]+graph.edges[e].length))
-      {
-        dist[graph.edges[e].v1] = dist[u] + graph.edges[e].length;
-        prev[graph.edges[e].v1] = u;
+        if(graph.edges[e].v1 == u && Q_set[graph.edges[e].v2] && dist[graph.edges[e].v2] > (dist[u]+graph.edges[e].length))
+        {
+          dist[graph.edges[e].v2] = dist[u] + graph.edges[e].length;
+          prev[graph.edges[e].v2] = u;
+        }
+        if(graph.edges[e].v2 == u && Q_set[graph.edges[e].v1] && dist[graph.edges[e].v1] > (dist[u]+graph.edges[e].length))
+        {
+          dist[graph.edges[e].v1] = dist[u] + graph.edges[e].length;
+          prev[graph.edges[e].v1] = u;
+        }
       }
     }
   }
