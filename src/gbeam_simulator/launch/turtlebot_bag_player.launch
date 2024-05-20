@@ -1,0 +1,24 @@
+<launch>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="x_pos" default="-0.7"/>
+  <arg name="y_pos" default="0.0"/>
+  <arg name="z_pos" default="0.0"/>
+
+  <include file="$(find gbeam_ground)/launch/gbeam_ground.launch"/>
+
+  <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model turtlebot3_burger -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gbeam_simulator)/rviz/gbeam_turtlebot_gazebo.rviz"/>
+
+  <include file="$(find gbeam_simulator)/launch/turtlebot_gbeam_params.launch"/>
+	<include file="$(find gbeam_controller)/launch/gbeam_controller.launch"/>
+
+  <node name="console" pkg="rqt_console" type="rqt_console"/>
+
+  <node pkg="rosbag" type="play" name="player" args="--clock $(find gbeam_simulator)/rosbags/sim.bag
+   --topics /clock /scan /tf /tf_static"/>
+
+  <node pkg="rosservice" type="rosservice" name="enable_mapping" args="call /gbeam/set_mapping_status true"/>
+
+</launch>
