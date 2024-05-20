@@ -44,6 +44,7 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
   visualization_msgs::Marker normals;
     normals.ns = "graph_drawer", normals.id = 1, normals.type = 5, normals.scale.x = 0.01;
     normals.header = poly_ptr->header;
+    normals.pose.orientation.w = 1;
   std_msgs::ColorRGBA normals_color;
     normals_color.r = 1, normals_color.g = 0.8, normals_color.b = 0.5, normals_color.a = 1;
 

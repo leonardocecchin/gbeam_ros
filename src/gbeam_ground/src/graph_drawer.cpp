@@ -62,6 +62,7 @@ void graphCallback(const gbeam_library::ReachabilityGraph::ConstPtr& graph_ptr)
   //initialize normals, for /graph_nodes_normals
   visualization_msgs::Marker nodes_normals;
     nodes_normals.ns = "graph_drawer", nodes_normals.id = 1, nodes_normals.type = 5, nodes_normals.scale.x = 0.005 * scaling;
+    nodes_normals.pose.orientation.w = 1;
 
   //initialize edge_markers for /graph_edges
   visualization_msgs::Marker edges_markers;
