@@ -16,6 +16,7 @@
 #include "graph_fcn.h"
 #include "exploration_fcn.h"
 
+#define INF 1000000
 
 ros::Publisher pos_ref_pub;
 
@@ -42,13 +43,13 @@ void computeNewTarget()
 {
   geometry_msgs::PoseStamped pos_ref;
 
-  float max_reward = -10;
+  float max_reward = -INF;
   int best_node = 0;
   float dist[N];
 
   if (last_target < 0)
   {
-    ROS_INFO("No target selected yet, selecting first node");
+    ROS_WARN("No target selected yet, selecting first node");
     last_target = 0;
     last_target_vertex = graph.nodes[0];;
 
@@ -70,39 +71,49 @@ void computeNewTarget()
 
   shortestDistances(graph, dist, last_target);
 
-  ROS_INFO("Computing new target node");
   for(int n=0; n<N; n++)
   {
     // if((graph.nodes[n].x > limit_xi) && (graph.nodes[n].x < limit_xs) && (graph.nodes[n].y > limit_yi) && (graph.nodes[n].y < limit_ys))
     if(graph.nodes[n].is_reachable && n!=last_target)  // choose only reachable targets, different from last target
     {
       float reward = graph.nodes[n].gain / pow(dist[n],distance_exp);
-      if(reward > max_reward)
+      if(reward > max_reward && n != last_target)
       {
         max_reward = reward;
         best_node = n;
       }
     }
   }
-
-  ROS_INFO("Target node (best): %d", best_node);
-
-  ROS_INFO("Computing path from %d to %d", last_target, best_node);
-  ros::Duration(0.1).sleep();
-  std::vector<int> path = dijkstra(graph, last_target, best_node);
-
-  if (path.size() > 1)
+  // Terminate node if all rewards are null
+  if (max_reward <= 0)
   {
-    std::string path_str;
-    for (int i=0; i<path.size(); i++)
-      path_str = path_str + std::to_string(path[i]) + "-";
-    ROS_INFO("New path is: %s", path_str.c_str());
+    ROS_WARN("All rewards are null, terminating node");
+    ros::shutdown();
+  }
 
-    last_target = path[1];
+  if (best_node == last_target)
+  {
+    ROS_WARN("Best node is the same as last target, maintaining last target");
   }
   else
   {
-    ROS_INFO("No path found, maintaining last target");
+    ROS_INFO("Target node: %d, computing path from %d to %d", best_node, last_target, best_node);
+    std::vector<int> path = dijkstra(graph, last_target, best_node);
+
+    if (path.size() > 1)
+    {
+      std::string path_str;
+      for (int i=0; i<path.size(); i++)
+        path_str = path_str + std::to_string(path[i]) + "-";
+      path_str.pop_back();  // remove last '-'
+      ROS_INFO("New path is: %s", path_str.c_str());
+
+      last_target = path[1];
+    }
+    else
+    {
+      ROS_WARN("No path found, maintaining last target");
+    }
   }
   
 

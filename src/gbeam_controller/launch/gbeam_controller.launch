@@ -5,6 +5,6 @@
 <!-- GBEAM GRAPH UPDATE -->
   <node name="graph_update" pkg="gbeam_controller" type="graph_update_node" />
 
-  <node name="exploration" pkg="gbeam_controller" type="exploration_node" />
+  <node name="exploration" pkg="gbeam_controller" type="exploration_node" required="true"/>
 
 </launch>
