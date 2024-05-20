@@ -112,7 +112,7 @@ void shortestDistances(gbeam_library::ReachabilityGraph graph, float dist[], int
   return;
 }
 
-// compute shortest path in graph from start to end
+// compute shortest path in graph from start (s) to end (t)
 // using Dijkstra algorithm
 std::vector<int> dijkstra(gbeam_library::ReachabilityGraph graph, int s, int t)
 {
@@ -164,7 +164,14 @@ std::vector<int> dijkstra(gbeam_library::ReachabilityGraph graph, int s, int t)
   std::vector<int> path;
   path.push_back(t);
   while(path[0] != s)
-  path.insert(path.begin(), prev[path[0]]);
+  {
+    path.insert(path.begin(), prev[path[0]]);
+    if (path[0] == -1) // if the path is not found, return an empty path
+    {
+      path.clear();
+      break;
+    }
+  }
 
   return path;
 }

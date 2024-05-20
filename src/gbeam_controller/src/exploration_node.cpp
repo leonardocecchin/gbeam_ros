@@ -24,6 +24,7 @@ geometry_msgs::TransformStamped l2g_tf;
 gbeam_library::ReachabilityGraph graph;
 int N = 0, E = 0;
 
+float rate = 2;
 int last_target = -1;
 float limit_xi = 0, limit_xs = 0, limit_yi = 0, limit_ys = 0;
 float distance_exp = 2;
@@ -41,16 +42,39 @@ void computeNewTarget()
 {
   geometry_msgs::PoseStamped pos_ref;
 
-  float max_reward = 0;
+  float max_reward = -10;
   int best_node = 0;
   float dist[N];
 
+  if (last_target < 0)
+  {
+    ROS_INFO("No target selected yet, selecting first node");
+    last_target = 0;
+    last_target_vertex = graph.nodes[0];;
+
+    pos_ref.pose.position = vertex2point(last_target_vertex);
+    pos_ref.pose.position.z = mapping_z;
+
+    // Fill other properties of pos_ref
+    pos_ref.header.stamp = ros::Time::now();
+    pos_ref.header.frame_id = "odom";
+
+    pos_ref.pose.orientation.x = 0.0;
+    pos_ref.pose.orientation.y = 0.0;
+    pos_ref.pose.orientation.z = 0.0;
+    pos_ref.pose.orientation.w = 1.0;
+
+    pos_ref_pub.publish(pos_ref);
+    return;
+  }
+
   shortestDistances(graph, dist, last_target);
 
+  ROS_INFO("Computing new target node");
   for(int n=0; n<N; n++)
   {
     // if((graph.nodes[n].x > limit_xi) && (graph.nodes[n].x < limit_xs) && (graph.nodes[n].y > limit_yi) && (graph.nodes[n].y < limit_ys))
-    if(graph.nodes[n].is_reachable)  // choose only reachable targets
+    if(graph.nodes[n].is_reachable && n!=last_target)  // choose only reachable targets, different from last target
     {
       float reward = graph.nodes[n].gain / pow(dist[n],distance_exp);
       if(reward > max_reward)
@@ -64,15 +88,23 @@ void computeNewTarget()
   ROS_INFO("Target node (best): %d", best_node);
 
   ROS_INFO("Computing path from %d to %d", last_target, best_node);
+  ros::Duration(0.1).sleep();
   std::vector<int> path = dijkstra(graph, last_target, best_node);
 
-  std::string path_str;
-  for (int i=0; i<path.size(); i++)
-    path_str = path_str + std::to_string(path[i]) + "-";
-  ROS_INFO("New path is: %s", path_str.c_str());
-
   if (path.size() > 1)
+  {
+    std::string path_str;
+    for (int i=0; i<path.size(); i++)
+      path_str = path_str + std::to_string(path[i]) + "-";
+    ROS_INFO("New path is: %s", path_str.c_str());
+
     last_target = path[1];
+  }
+  else
+  {
+    ROS_INFO("No path found, maintaining last target");
+  }
+  
 
   gbeam_library::Vertex vert = applyBoundary(graph.nodes[last_target], limit_xi, limit_xs, limit_yi, limit_ys);
   last_target_vertex = vert;
@@ -96,7 +128,8 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "graph_expl");
   ros::NodeHandle n;
-  ros::Rate loop_rate(50);
+  ros::param::get("/gbeam_controller/rate", rate);
+  ros::Rate loop_rate(rate);
 
   ros::Subscriber graph_sub = n.subscribe("gbeam/reachability_graph", 1, graphCallback);
 
@@ -137,7 +170,7 @@ int main(int argc, char **argv)
     if(N>0)
     {
       if(last_target < 0)
-        last_target = 0, computeNewTarget();
+        computeNewTarget();
       else
         if(dist(last_target_vertex, position) <= reached_tol)
           computeNewTarget();
