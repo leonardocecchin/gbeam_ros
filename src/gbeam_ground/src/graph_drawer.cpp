@@ -28,6 +28,8 @@
 
 ros::Publisher graph_nodes_pub;
 ros::Publisher graph_normals_pub;
+ros::Publisher graph_walkable_edges_pub;
+ros::Publisher graph_boundary_edges_pub;
 ros::Publisher graph_edges_pub;
 
 float scaling = 1;
@@ -51,9 +53,10 @@ void graphCallback(const gbeam_library::ReachabilityGraph::ConstPtr& graph_ptr)
 
   //initialize node_points for /graph_nodes
   sensor_msgs::PointCloud node_points;
-  sensor_msgs::ChannelFloat32 expGainChan, obstacleChan, connectedChan;
+  sensor_msgs::ChannelFloat32 expGainChan, obstacleChan, reachableChan, connectedChan;
     expGainChan.name = "exploration_gain";
     obstacleChan.name = "is_obstacle";
+    reachableChan.name = "is_reachable";
     connectedChan.name = "is_compl_connected";
 
   //initialize normals, for /graph_nodes_normals
@@ -63,7 +66,15 @@ void graphCallback(const gbeam_library::ReachabilityGraph::ConstPtr& graph_ptr)
   //initialize edge_markers for /graph_edges
   visualization_msgs::Marker edges_markers;
     edges_markers.ns = "graph_drawer", edges_markers.id = 1, edges_markers.type = 5, edges_markers.scale.x = 0.005 * scaling;
-    // edges_markers.pose   could be initialized, actually not needed, ony gives a warning
+    edges_markers.pose.orientation.w = 1;
+  //initialize walkable_edge_markers for /graph_walkable_edges
+  visualization_msgs::Marker walkable_edges_markers;
+    walkable_edges_markers.ns = "graph_drawer", walkable_edges_markers.id = 1, walkable_edges_markers.type = 5, walkable_edges_markers.scale.x = 0.005 * scaling;
+    walkable_edges_markers.pose.orientation.w = 1;
+  //initialize boundary_edge_markers for /graph_boundary_edges
+  visualization_msgs::Marker boundary_edges_markers;
+    boundary_edges_markers.ns = "graph_drawer", boundary_edges_markers.id = 1, boundary_edges_markers.type = 5, boundary_edges_markers.scale.x = 0.005 * scaling;
+    boundary_edges_markers.pose.orientation.w = 1;
 
   //add nodes and nodes normals
   for(int n=0; n<graph_ptr->nodes.size(); n++)
@@ -75,6 +86,7 @@ void graphCallback(const gbeam_library::ReachabilityGraph::ConstPtr& graph_ptr)
     node_points.points.push_back(point);
     expGainChan.values.push_back(graph_ptr->nodes[n].gain);
     obstacleChan.values.push_back(graph_ptr->nodes[n].is_obstacle);
+    reachableChan.values.push_back(graph_ptr->nodes[n].is_reachable);
     connectedChan.values.push_back(graph_ptr->nodes[n].is_completely_connected);
 
     if(graph_ptr->nodes[n].is_obstacle)
@@ -96,22 +108,26 @@ void graphCallback(const gbeam_library::ReachabilityGraph::ConstPtr& graph_ptr)
   //add edges
   for(int e=0; e<graph_ptr->edges.size(); e++)
   {
-    edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v1]));
-    edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v2]));
     if (graph_ptr->edges[e].is_boundary)
       {
-        edges_markers.colors.push_back(boundary_color);
-        edges_markers.colors.push_back(boundary_color);
+        boundary_edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v1]));
+        boundary_edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v2]));
+        boundary_edges_markers.colors.push_back(boundary_color);
+        boundary_edges_markers.colors.push_back(boundary_color);
       }
     else
       {
         if (graph_ptr->edges[e].is_walkable)
         {
-          edges_markers.colors.push_back(walkable_color);
-          edges_markers.colors.push_back(walkable_color);
+          walkable_edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v1]));
+          walkable_edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v2]));
+          walkable_edges_markers.colors.push_back(walkable_color);
+          walkable_edges_markers.colors.push_back(walkable_color);
         }
         else
         {
+          edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v1]));
+          edges_markers.points.push_back(vertex2point(graph_ptr->nodes[graph_ptr->edges[e].v2]));
           edges_markers.colors.push_back(inside_color);
           edges_markers.colors.push_back(inside_color);
         }
@@ -119,15 +135,20 @@ void graphCallback(const gbeam_library::ReachabilityGraph::ConstPtr& graph_ptr)
   }
   node_points.channels.push_back(expGainChan);
   node_points.channels.push_back(obstacleChan);
+  node_points.channels.push_back(reachableChan);
   node_points.channels.push_back(connectedChan);
 
   node_points.header.frame_id = "odom";
   edges_markers.header.frame_id = "odom";
+  walkable_edges_markers.header.frame_id = "odom";
+  boundary_edges_markers.header.frame_id = "odom";
   nodes_normals.header.frame_id = "odom";
 
   graph_nodes_pub.publish(node_points);
   graph_normals_pub.publish(nodes_normals);
   graph_edges_pub.publish(edges_markers);
+  graph_walkable_edges_pub.publish(walkable_edges_markers);
+  graph_boundary_edges_pub.publish(boundary_edges_markers);
 }
 
 int main(int argc, char **argv)
@@ -141,6 +162,8 @@ int main(int argc, char **argv)
   graph_nodes_pub = n.advertise<sensor_msgs::PointCloud>("gbeam_visualization/graph_nodes", 1);
   graph_normals_pub = n.advertise<visualization_msgs::Marker>("gbeam_visualization/graph_nodes_normals", 1);
   graph_edges_pub = n.advertise<visualization_msgs::Marker>("gbeam_visualization/graph_edges", 1);
+  graph_walkable_edges_pub = n.advertise<visualization_msgs::Marker>("gbeam_visualization/graph_walkable_edges", 1);
+  graph_boundary_edges_pub = n.advertise<visualization_msgs::Marker>("gbeam_visualization/graph_boundary_edges", 1);
 
   ros::spin();
 
