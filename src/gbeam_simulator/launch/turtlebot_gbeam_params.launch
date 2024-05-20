@@ -12,10 +12,10 @@
   <param name="/gbeam_controller/robot_param/safe_dist" value="0.3" type="double" />
 
 <!-- GBEAM POLYTOPE GENERATION -->
-  <param name="/gbeam_controller/polytope_generation_param/rate" value="2" type="double" />
+  <param name="/gbeam_controller/rate" value="2.0" type="double" />
   <param name="/gbeam_controller/polytope_generation_param/num_vertices" value="8" type="int" />
-  <param name="/gbeam_controller/polytope_generation_param/distance_step" value="0.005" type="double" />
-  <param name="/gbeam_controller/polytope_generation_param/start_dist" value="0.15" type="double" />
+  <param name="/gbeam_controller/polytope_generation_param/distance_step" value="0.05" type="double" />
+  <param name="/gbeam_controller/polytope_generation_param/start_distance" value="0.2" type="double" />
   <param name="/gbeam_controller/polytope_generation_param/vertex_obstacle_dist" value="0.05" type="double" />
 
 
@@ -24,16 +24,18 @@
   <param name="/gbeam_controller/graph_update_param/node_dist_open" value="0.3" type="double" />
   <param name="/gbeam_controller/graph_update_param/node_bound_dist" value="0.2" type="double" />
   <param name="/gbeam_controller/graph_update_param/node_obstacle_margin" value="0.05" type="double" />
+  <param name="/gbeam_controller/graph_update_param/obstacle_gain" value="0.01" type="double" />
   <!-- note: bound_dist < 2*(safe_dist - vertex_obstacle_dist) -->
 
 <!-- GBEAM EXPLORATION -->
-  <param name="/gbeam_controller/exploration_param/reached_tol" value="0.05" type="double" />
+  <param name="/gbeam_controller/exploration_param/reached_tol" value="0.1" type="double" />
   <param name="/gbeam_controller/exploration_param/limit_xi" value="-10" type="double" />
   <param name="/gbeam_controller/exploration_param/limit_xs" value="10" type="double" />
   <param name="/gbeam_controller/exploration_param/limit_yi" value="-10" type="double" />
   <param name="/gbeam_controller/exploration_param/limit_ys" value="10" type="double" />
 
   <param name="/gbeam_controller/exploration_param/distance_exp" value="4" type="double" />
+  <param name="/gbeam_controller/exploration_param/distance_penalty_multiplier" value="0.1" type="double" />
 
 
 </launch>

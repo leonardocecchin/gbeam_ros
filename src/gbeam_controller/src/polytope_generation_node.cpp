@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   ros::Subscriber scan_sub = n.subscribe("scan", 1, scanCallback);
   free_poly_pub = n.advertise<gbeam_library::FreePolygonStamped>("gbeam/free_polytope", 1);
 
-  ros::param::get("/gbeam_controller/polytope_generation_param/rate", update_freq);
+  ros::param::get("/gbeam_controller/rate", update_freq);
   ros::Rate loop_rate(update_freq); // execute at 1 Hz
 
   while(ros::ok())
