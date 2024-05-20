@@ -152,6 +152,8 @@ bool isInside(geometry_msgs::Polygon poly, geometry_msgs::Point32 p)
 // check if p lies inside the convex polygon poly
 bool isInsideConv(geometry_msgs::Polygon poly, geometry_msgs::Point32 p)
 {
+  if (!isConv(poly))
+    return false;
   int n = poly.points.size();
   // less than 3 vertices --> no polygon
   if (n < 3)

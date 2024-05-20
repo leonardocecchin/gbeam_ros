@@ -37,10 +37,13 @@ tf2_ros::Buffer tfBuffer;
 
 bool mapping_status = false;
 
+float rate = 2.0;
+
 float adjacency[10000][10000] = {};
 
 float node_dist_min = 0.2, node_dist_open = 1;
 float node_bound_dist = 0.5;
+float obstacle_gain = 0.1;
 float safe_dist = 0.2, reached_tol = 0.1;
 float limit_xi = 0, limit_xs = 0, limit_yi = 0, limit_ys = 0;
 
@@ -65,6 +68,7 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
   ros::param::get("/gbeam_controller/graph_update_param/node_dist_open", node_dist_open);
   ros::param::get("/gbeam_controller/graph_update_param/node_bound_dist", node_bound_dist);
   ros::param::get("/gbeam_controller/graph_update_param/node_obstacle_margin", obstacle_margin);
+  ros::param::get("/gbeam_controller/graph_update_param/obstacle_gain", obstacle_gain);
   ros::param::get("/gbeam_controller/robot_param/safe_dist", safe_dist);
   // exploration limits
   ros::param::get("/gbeam_controller/exploration_param/limit_xi", limit_xi);
@@ -92,6 +96,7 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
   // ###########################
 
   //add graph vertices if they satisfy condition
+  // reachable vertices
   for (int i=0; i<poly_ptr->polygon.vertices_reachable.size(); i++)
   {
     gbeam_library::Vertex vert = poly_ptr->polygon.vertices_reachable[i];  //get vertex from polytope
@@ -115,6 +120,7 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
       is_changed = true;
     }
   }
+  // obstacle vertices
   for (int i=0; i<poly_ptr->polygon.vertices_obstacles.size(); i++)
   {
     gbeam_library::Vertex vert = poly_ptr->polygon.vertices_obstacles[i];  //get vertex from polytope
@@ -127,12 +133,10 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
     if ((vert_dist > node_dist_min) && vert.is_obstacle)
     {
       vert.id = graph.nodes.size();
-      vert.gain ++;
+      vert.gain = obstacle_gain;
+      vert.is_reachable = false;
       if (!isInBoundary(vert, limit_xi, limit_xs, limit_yi, limit_ys))
-      {
-        vert.is_reachable = false;
         vert.gain = 0;
-      }
       graph.nodes.push_back(vert); //add vertex to the graph
       is_changed = true;
     }
@@ -161,7 +165,8 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
         //then add edge i-j to graph
         gbeam_library::GraphEdge edge = computeEdge(graph.nodes[inObstaclesId[i]], graph.nodes[inObstaclesId[j]], node_bound_dist);
         edge.id = graph.edges.size();
-        if(isInsideReachable(polyGlobal, graph.nodes[i]) && isInsideReachable(polyGlobal, graph.nodes[j]))
+        if(isInsideReachable(polyGlobal, graph.nodes[inObstaclesId[i]]) && isInsideReachable(polyGlobal, graph.nodes[inObstaclesId[j]]) 
+          && graph.nodes[inObstaclesId[i]].is_reachable && graph.nodes[inObstaclesId[j]].is_reachable)
           edge.is_walkable = true;  // if both vertices are inside reachable poly, then the edge is walkable
         graph.edges.push_back(edge);
 
@@ -174,7 +179,8 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
       else  // if edge is present, check if it is walkable
       {
         int e = adjacency[inObstaclesId[i]][inObstaclesId[j]];
-        if(isInsideReachable(polyGlobal, graph.nodes[graph.edges[e].v1]) && isInsideReachable(polyGlobal, graph.nodes[graph.edges[e].v2]))
+        if(isInsideReachable(polyGlobal, graph.nodes[graph.edges[e].v1]) && isInsideReachable(polyGlobal, graph.nodes[graph.edges[e].v2])
+          && graph.nodes[graph.edges[e].v1].is_reachable && graph.nodes[graph.edges[e].v2].is_reachable)
           graph.edges[e].is_walkable = true;
       }
     }
@@ -224,11 +230,11 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
   for (int i=0; i<graph.nodes.size(); i++)
   {
     // if node is inside reachable area, and gain is > 1, decrease gain to 1
-    if (isInsideReachable(polyGlobal, graph.nodes[i]) && graph.nodes[i].gain > 1)
-    {
-      graph.nodes[i].gain = 1;
-      is_changed = true;
-    }
+    // if (isInsideReachable(polyGlobal, graph.nodes[i]) && graph.nodes[i].gain > 1)
+    // {
+    //   graph.nodes[i].gain = 1;
+    //   is_changed = true;
+    // }
     // if node has been visited, set gain to 0
     if (dist(position, graph.nodes[i]) < reached_tol)
     {
@@ -248,7 +254,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "graph_update");
   ros::NodeHandle n;
   ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug); //set console to show debug messages by default
-  ros::Rate loop_rate(10.0);
+  ros::param::get("/gbeam_controller/rate", rate);
+  ros::Rate loop_rate(rate);
 
   ros::Subscriber poly_sub = n.subscribe("gbeam/free_polytope", 1, polyCallback);
 
