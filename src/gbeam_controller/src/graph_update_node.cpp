@@ -126,15 +126,30 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
     gbeam_library::Vertex vert = poly_ptr->polygon.vertices_obstacles[i];  //get vertex from polytope
     vert = vert_transform(vert, l2g_tf); //change coordinates to global position
 
+    gbeam_library::Vertex vert_reach = poly_ptr->polygon.vertices_reachable[i];  //get vertex from polytope
+    vert_reach = vert_transform(vert_reach, l2g_tf); //change coordinates to global position
+
     vert = moveAway(vert, obstacle_margin);
 
     float vert_dist = vert_graph_distance_obstacle(graph, vert);
 
     if ((vert_dist > node_dist_min) && vert.is_obstacle)
     {
+      // add respective reachable node
+      vert_reach.id = graph.nodes.size();
+      vert_reach.is_reachable = true;
+      vert_reach.gain ++;
+      if (!isInBoundary(vert_reach, limit_xi, limit_xs, limit_yi, limit_ys))
+      {
+        vert_reach.is_reachable = false;
+        vert_reach.gain = 0;
+      }
+      graph.nodes.push_back(vert_reach); //add vertex to the graph
+
       vert.id = graph.nodes.size();
       vert.gain = obstacle_gain;
       vert.is_reachable = false;
+      vert.reachable_id = vert_reach.id;
       if (!isInBoundary(vert, limit_xi, limit_xs, limit_yi, limit_ys))
         vert.gain = 0;
       graph.nodes.push_back(vert); //add vertex to the graph
@@ -236,7 +251,7 @@ void polyCallback(const gbeam_library::FreePolygonStamped::ConstPtr& poly_ptr)
     //   is_changed = true;
     // }
     // if node has been visited, set gain to 0
-    if (dist(position, graph.nodes[i]) < reached_tol)
+    if ((dist(position, graph.nodes[i]) < reached_tol) && !graph.nodes[i].is_obstacle)
     {
       graph.nodes[i].gain = 0;
       graph.nodes[i].is_visited = true;

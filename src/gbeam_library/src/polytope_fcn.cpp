@@ -164,10 +164,10 @@ bool isInsideConv(geometry_msgs::Polygon poly, geometry_msgs::Point32 p)
   do
   {
       int next = (i+1)%n;
-      if (orientation(poly.points[i], poly.points[next], p) <= 1) //==1 -> consider also boundary
+      if (orientation(poly.points[i], poly.points[next], p) == 2) // if the triplet is CCW oriented, not in CW polytope
         inCW = false;
       else
-        if (orientation(poly.points[i], poly.points[next], p) >= -1)
+        if (orientation(poly.points[i], poly.points[next], p) == 1) // if the triplet is CW oriented, not in CCW polytope
           inCCW = false;
 
       i = next;
@@ -316,6 +316,7 @@ gbeam_library::FreePolygon createReachablePolygon(gbeam_library::FreePolygon in,
     poly.vertices_reachable[i].y += l*by;
     poly.vertices_reachable[i].is_reachable = true;
     poly.vertices_reachable[i].is_obstacle = false;
+    poly.vertices_reachable[i].is_completely_connected = false;
   }
 
   return poly;

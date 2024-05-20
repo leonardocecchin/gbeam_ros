@@ -3,6 +3,7 @@ float32 x
 float32 y
 float32 z
 int64[] neighbors
+int64 reachable_id
 float32 gain
 geometry_msgs/Vector3 obstacle_normal
 bool is_obstacle

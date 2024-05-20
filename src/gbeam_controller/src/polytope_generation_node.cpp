@@ -156,6 +156,7 @@ int main(int argc, char **argv)
         vert_obs.gain = exp_gain;
         vert_obs.is_visited = false;
         vert_obs.is_reachable = false;
+        vert_obs.is_completely_connected = false;
 
         if (countClose(poly.polygon.points[v], obstacles, obstacle_d_thr)>2)
         {

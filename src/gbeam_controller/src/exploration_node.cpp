@@ -73,14 +73,22 @@ void computeNewTarget()
 
   for(int n=0; n<N; n++)
   {
-    // if((graph.nodes[n].x > limit_xi) && (graph.nodes[n].x < limit_xs) && (graph.nodes[n].y > limit_yi) && (graph.nodes[n].y < limit_ys))
-    if(graph.nodes[n].is_reachable && n!=last_target)  // choose only reachable targets, different from last target
+    if (graph.nodes[n].is_reachable && n!=last_target)  // choose reachable targets, different from last target
     {
       float reward = graph.nodes[n].gain / pow(dist[n],distance_exp);
-      if(reward > max_reward && n != last_target)
+      if(reward > max_reward)
       {
         max_reward = reward;
         best_node = n;
+      }
+    }
+    if (graph.nodes[n].is_obstacle && graph.nodes[n].reachable_id!=last_target)
+    {
+      float reward = graph.nodes[n].gain / pow(dist[graph.nodes[n].reachable_id],distance_exp);
+      if(reward > max_reward)
+      {
+        max_reward = reward;
+        best_node = graph.nodes[n].reachable_id;
       }
     }
   }
