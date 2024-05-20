@@ -161,7 +161,7 @@ int main(int argc, char **argv)
         if (countClose(poly.polygon.points[v], obstacles, obstacle_d_thr)>2)
         {
           vert_obs.is_obstacle = true;
-          vert_obs.obstacle_normal = computeNormal(poly.polygon.points[v], obstacles, obstacle_d_thr);
+          vert_obs.obstacle_normal = computeNormal(poly.polygon.points[v], obstacles, obstacle_d_thr*2);
         }
         else
         {

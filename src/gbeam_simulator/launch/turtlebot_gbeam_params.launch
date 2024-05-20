@@ -9,10 +9,10 @@
   <param name="/gbeam_controller/ddrive_position_param/rho_thr" value="0.02" type="double" />
 
 <!-- GBEAM ROBOT PARAMETERS -->
-  <param name="/gbeam_controller/robot_param/safe_dist" value="0.3" type="double" />
+  <param name="/gbeam_controller/robot_param/safe_dist" value="0.25" type="double" />
 
 <!-- GBEAM POLYTOPE GENERATION -->
-  <param name="/gbeam_controller/rate" value="2.0" type="double" />
+  <param name="/gbeam_controller/rate" value="5.0" type="double" />
   <param name="/gbeam_controller/polytope_generation_param/num_vertices" value="8" type="int" />
   <param name="/gbeam_controller/polytope_generation_param/distance_step" value="0.05" type="double" />
   <param name="/gbeam_controller/polytope_generation_param/start_distance" value="0.2" type="double" />
@@ -22,7 +22,7 @@
 <!-- GBEAM GRAPH UPDATE -->
   <param name="/gbeam_controller/graph_update_param/node_dist_min" value="0.1" type="double" />
   <param name="/gbeam_controller/graph_update_param/node_dist_open" value="0.3" type="double" />
-  <param name="/gbeam_controller/graph_update_param/node_bound_dist" value="0.2" type="double" />
+  <param name="/gbeam_controller/graph_update_param/node_bound_dist" value="0.5" type="double" />
   <param name="/gbeam_controller/graph_update_param/node_obstacle_margin" value="0.05" type="double" />
   <param name="/gbeam_controller/graph_update_param/obstacle_gain" value="0.01" type="double" />
   <!-- note: bound_dist < 2*(safe_dist - vertex_obstacle_dist) -->
@@ -34,8 +34,7 @@
   <param name="/gbeam_controller/exploration_param/limit_yi" value="-10" type="double" />
   <param name="/gbeam_controller/exploration_param/limit_ys" value="10" type="double" />
 
-  <param name="/gbeam_controller/exploration_param/distance_exp" value="4" type="double" />
-  <param name="/gbeam_controller/exploration_param/distance_penalty_multiplier" value="0.1" type="double" />
+  <param name="/gbeam_controller/exploration_param/distance_exp" value="1" type="double" />
 
 
 </launch>

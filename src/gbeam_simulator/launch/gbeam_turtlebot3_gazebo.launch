@@ -24,7 +24,7 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gbeam_simulator)/rviz/gbeam_turtlebot_gazebo.rviz"/>
 
-  <node name="console" pkg="rqt_console" type="rqt_console"/>
+  <!-- <node name="console" pkg="rqt_console" type="rqt_console"/> -->
 
 
   <!-- Launch GBEAM -->
